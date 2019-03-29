@@ -1,4 +1,4 @@
-from prometheus_client.core import InfoMetricFamily
+from prometheus_client.core import InfoMetricFamily, StateSetMetricFamily
 
 from requests import get
 from requests.compat import urljoin
@@ -17,6 +17,12 @@ class KibanaCollector(object):
     def _version_metric(version: dict) -> InfoMetricFamily:
         return InfoMetricFamily('kibana_version', 'Kibana Version', value=version)
 
+    @staticmethod
+    def _status_metric(status: dict) -> StateSetMetricFamily:
+        status_dict = {state: state == status['overall']['state'] for state in ['red', 'yellow', 'green']}
+        return StateSetMetricFamily('kibana_status', 'Kibana Status', value=status_dict)
+
     def collect(self):
         stats = self._fetch_stats()
         yield self._version_metric(stats['version'])
+        yield self._status_metric(stats['status'])
