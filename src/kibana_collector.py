@@ -1,4 +1,7 @@
-from prometheus_client.core import InfoMetricFamily, StateSetMetricFamily
+from datetime import datetime
+from itertools import chain
+
+from prometheus_client.core import InfoMetricFamily, StateSetMetricFamily, GaugeMetricFamily
 
 from requests import get
 from requests.compat import urljoin
@@ -14,15 +17,14 @@ class KibanaCollector(object):
         return r.json()
 
     @staticmethod
-    def _version_metric(version: dict) -> InfoMetricFamily:
-        return InfoMetricFamily('kibana_version', 'Kibana Version', value=version)
-
-    @staticmethod
-    def _status_metric(status: dict) -> StateSetMetricFamily:
+    def _status_metrics(status: dict) -> (StateSetMetricFamily, GaugeMetricFamily):
         status_dict = {state: state == status['overall']['state'] for state in ['red', 'yellow', 'green']}
-        return StateSetMetricFamily('kibana_status', 'Kibana Status', value=status_dict)
+        since = datetime.strptime(status['overall']['since'], '%Y-%m-%dT%H:%M:%S.%f%z').timestamp()
+        status = StateSetMetricFamily('kibana_status', 'Kibana Status', value=status_dict)
+        since = GaugeMetricFamily('kibana_status_since', 'Last change of status, in seconds since epoch', value=since)
+        return status, since
 
     def collect(self):
         stats = self._fetch_stats()
-        yield self._version_metric(stats['version'])
-        yield self._status_metric(stats['status'])
+        yield InfoMetricFamily('kibana_version', 'Kibana Version', value=stats['version'])
+        yield from self._status_metrics(stats['status'])
