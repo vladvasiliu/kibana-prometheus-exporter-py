@@ -9,9 +9,11 @@ from twisted.internet import reactor
 
 from kibana_collector import KibanaCollector
 
+DEFAULT_PORT = 9563
 
 if __name__ == '__main__':
-    url = os.getenv('KIBANA_URL', None)
+    url = os.getenv('KIBANA_URL')
+    port = os.getenv('EXPORTER_PORT', DEFAULT_PORT)
     if not url:
         sys.exit(1)
 

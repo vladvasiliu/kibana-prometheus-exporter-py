@@ -71,7 +71,7 @@ def _requests(req_dict: dict) -> iter:
     disconnects = CounterMetricFamily('kibana_requests_disconnects',
                                       'Total requests disconnected',
                                       value=req_dict['disconnects'])
-    per_status = CounterMetricFamily('kibana_requests_status_codes',
+    per_status = CounterMetricFamily('kibana_requests',
                                      'Total requests by status code',
                                      labels=['status_code'])
 
