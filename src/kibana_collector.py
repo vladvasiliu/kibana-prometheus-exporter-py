@@ -64,10 +64,28 @@ def _os(os_dict: dict) -> iter:
     return result
 
 
+def _requests(req_dict: dict) -> iter:
+    total = CounterMetricFamily('kibana_requests_total',
+                                'Total requests serviced',
+                                value=req_dict['total'])
+    disconnects = CounterMetricFamily('kibana_requests_disconnects',
+                                      'Total requests disconnected',
+                                      value=req_dict['disconnects'])
+    per_status = CounterMetricFamily('kibana_requests_status_codes',
+                                     'Total requests by status code',
+                                     labels=['status_code'])
+
+    for code, count in req_dict['status_codes'].items():
+        per_status.add_metric([code], count)
+
+    return total, disconnects, per_status
+
+
 def _metrics(metrics_dict: dict):
     # last_updated = datestring_to_timestamp(metrics_dict['last_updated'])
     metrics = list(_process(metrics_dict['process']))
     metrics.extend(_os(metrics_dict['os']))
+    metrics.extend(_requests(metrics_dict['requests']))
     return metrics
 
 
