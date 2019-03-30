@@ -1,4 +1,4 @@
-import os
+import logging
 import sys
 
 from prometheus_client.twisted import MetricsResource
@@ -7,20 +7,24 @@ from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet import reactor
 
+from config import Config
 from kibana_collector import KibanaCollector
 
-DEFAULT_PORT = 9563
+logger = logging.getLogger(__name__)
 
-kibana_url = os.getenv('KIBANA_URL')
-if not kibana_url:
+try:
+    config = Config()
+except ValueError:
+    logger.critical('Invalid configuration. Exiting.')
     sys.exit(1)
 
-exporter_port = os.getenv('EXPORTER_PORT', DEFAULT_PORT)
 
-REGISTRY.register(KibanaCollector(kibana_url))
+logger.info('Starting Kibana Prometheus exporter v%s\n' % config.version + config.description())
+
+REGISTRY.register(KibanaCollector(config.kibana_url))
 
 root = Resource()
 root.putChild(b'metrics', MetricsResource(registry=REGISTRY))
 factory = Site(root)
-reactor.listenTCP(exporter_port, factory)
+reactor.listenTCP(config.listen_port, factory)
 reactor.run()
