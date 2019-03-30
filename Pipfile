@@ -6,9 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-prometheus_client = "*"
 requests = "*"
 twisted = "*"
+prometheus-client = {editable = true,git = "https://github.com/vladvasiliu/client_python.git"}
 
 [requires]
 python_version = "3.7"
