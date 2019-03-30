@@ -81,11 +81,22 @@ def _requests(req_dict: dict) -> iter:
     return total, disconnects, per_status
 
 
+def _response_times(rt_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily):
+    max_rt = GaugeMetricFamily('kibana_response_time_max_seconds',
+                               'Kibana maximum response time in seconds',
+                               value=rt_dict['max_in_millis'] / 1000)
+    avg_rt = GaugeMetricFamily('kibana_response_time_avg_seconds',
+                               'Kibana average response time in seconds',
+                               value=rt_dict['avg_in_millis'] / 1000)
+    return max_rt, avg_rt
+
+
 def _metrics(metrics_dict: dict):
     # last_updated = datestring_to_timestamp(metrics_dict['last_updated'])
     metrics = list(_process(metrics_dict['process']))
     metrics.extend(_os(metrics_dict['os']))
     metrics.extend(_requests(metrics_dict['requests']))
+    metrics.extend(_response_times(metrics_dict['response_times']))
     return metrics
 
 
