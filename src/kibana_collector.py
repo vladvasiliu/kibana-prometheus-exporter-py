@@ -49,8 +49,8 @@ def _os_load(load_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily, GaugeMet
 
 
 def _os_memory(mem_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily, GaugeMetricFamily):
-    return (GaugeMetricFamily('kibana_os_memory_%s_bytes' % key,
-                              'Kibana %s OS memory' % key,
+    return (GaugeMetricFamily('kibana_os_memory_%s_bytes' % key.split('_')[0],
+                              'Kibana %s OS memory' % key.split('_')[0],
                               value=value) for key, value in mem_dict.items())
 
 
