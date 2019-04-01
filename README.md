@@ -1,3 +1,7 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/vladvasiliu/kibana_exporter.svg?maxAge=604800)](https://hub.docker.com/r/vladvasiliu/kibana_exporter)
+[![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](COPYING)
+
+
 # kibana-prometheus-exporter
 
 This is a Prometheus exporter for Kibana written in Python.
