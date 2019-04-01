@@ -106,11 +106,17 @@ def _metrics(metrics_dict: dict):
 
 
 class KibanaCollector(object):
-    def __init__(self, host: str, path: str = '/api/status'):
+    def __init__(self, host: str, path: str = '/api/status', kibana_login: str = None, kibana_password: str = None):
         self._url = urljoin(host, path)
+        self._kibana_login = kibana_login
+        self._kibana_password = kibana_password
 
     def _fetch_stats(self) -> dict:
-        r = get(self._url)
+        if self._kibana_login:
+            auth = (self._kibana_login, self._kibana_password)
+        else:
+            auth = None
+        r = get(self._url, auth=auth)
         r.raise_for_status()
         return r.json()
 

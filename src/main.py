@@ -21,9 +21,11 @@ except ValueError:
     sys.exit(1)
 
 
-logger.info('Starting Kibana Prometheus exporter v%s\n' % config.version + config.description())
+logger.info('Starting Kibana Prometheus exporter version %s\n' % config.version + config.description())
 
-REGISTRY.register(KibanaCollector(config.kibana_url))
+REGISTRY.register(KibanaCollector(config.kibana_url,
+                                  kibana_login=config.kibana_login,
+                                  kibana_password=config.kibana_password))
 
 root = Resource()
 root.putChild(b'metrics', MetricsResource(registry=REGISTRY))
