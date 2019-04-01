@@ -1,9 +1,14 @@
 from datetime import datetime
+import logging
 
 from prometheus_client.core import CounterMetricFamily, InfoMetricFamily, StateSetMetricFamily, GaugeMetricFamily
 
 from requests import get
 from requests.compat import urljoin
+from requests.exceptions import ConnectionError, Timeout, HTTPError, RequestException
+
+
+logger = logging.getLogger(__name__)
 
 
 def datestring_to_timestamp(date_str: str) -> float:
@@ -110,7 +115,21 @@ class KibanaCollector(object):
         return r.json()
 
     def collect(self):
-        stats = self._fetch_stats()
-        yield InfoMetricFamily('kibana_version', 'Kibana Version', value=stats['version'])
-        yield from _status(stats['status'])
-        yield from _metrics(stats['metrics'])
+        kibana_up = GaugeMetricFamily('kibana_node_reachable', 'Kibana node was reached', value=0)
+        try:
+            stats = self._fetch_stats()
+        except ConnectionError as e:
+            logger.warning('Got a connection error while trying to contact Kibana:\n%s' % e)
+        except Timeout as e:
+            logger.warning('Got a timeout while trying to contact Kibana:\n%s' % e)
+        except HTTPError as e:
+            logger.warning('Got a HTTP error %s while trying to contact Kibana:\n%s' % (e.response.status_code, e))
+        except RequestException as e:
+            logger.warning('Got a RequestException while trying to contact Kibana:\n%s' % e)
+        else:
+            kibana_up = GaugeMetricFamily('kibana_node_reachable', 'Kibana node was reached', value=1)
+            yield InfoMetricFamily('kibana_version', 'Kibana Version', value=stats['version'])
+            yield from _status(stats['status'])
+            yield from _metrics(stats['metrics'])
+        finally:
+            yield kibana_up
