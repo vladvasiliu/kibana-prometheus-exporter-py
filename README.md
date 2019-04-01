@@ -1,5 +1,7 @@
-[![Docker Pulls](https://img.shields.io/docker/pulls/vladvasiliu/kibana_exporter.svg?maxAge=604800)](https://hub.docker.com/r/vladvasiliu/kibana_exporter)
-[![License](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](COPYING)
+[![Scrutinizer code quality](https://img.shields.io/scrutinizer/g/vladvasiliu/kibana-prometheus-exporter-py.svg)](https://scrutinizer-ci.com/g/vladvasiliu/kibana-prometheus-exporter-py/)
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/vladvasiliu/kibana_exporter.svg)
+[![Docker Pulls](https://img.shields.io/docker/pulls/vladvasiliu/kibana_exporter.svg)](https://hub.docker.com/r/vladvasiliu/kibana_exporter)
+[![License](https://img.shields.io/github/license/vladvasiliu/kibana-prometheus-exporter-py.svg)](COPYING)
 
 
 # kibana-prometheus-exporter
