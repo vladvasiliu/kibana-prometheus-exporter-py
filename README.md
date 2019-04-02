@@ -61,6 +61,22 @@ A docker container is built and hosted [on the Docker Hub](https://pipenv.readth
     docker run -d -p 9563:9563 --name kibana_exporter -e KIBANA_URL="https://your_kibana_node.com" vladvasiliu/kibana_exporter:latest
 
 
+## Known issues and limitations
+
+### All metrics are gauges
+
+The exporter reads data from the Kibana Stats API. This API only provides "real time" metrics, refreshed every 5 seconds. As such, some metrics which usually are counters can only be gauges (eg `kibana_requests_total`).
+
+See below for how Kibana handles this internally :
+
+* [PR that replaces accumulating counters](https://github.com/elastic/kibana/pull/20577/files#r202416647)
+* [Source code](https://github.com/elastic/kibana/blob/master/src/legacy/server/status/collectors/get_ops_stats_collector.js#L27)
+
+### Missing metrics
+
+I have noticed since the update to Kibana 6.7 that sometimes the avg request time is missing from the stats dictionary. 
+
+
 ## Contributing
 
 Please feel free to send a PR for any changes or improvements you may have.
