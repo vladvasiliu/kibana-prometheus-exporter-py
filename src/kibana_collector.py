@@ -70,13 +70,13 @@ def _os(os_dict: dict) -> iter:
 
 
 def _requests(req_dict: dict) -> iter:
-    total = CounterMetricFamily('kibana_requests_total',
+    total = GaugeMetricFamily('kibana_requests_total',
                                 'Total requests serviced',
                                 value=req_dict['total'])
-    disconnects = CounterMetricFamily('kibana_requests_disconnects',
+    disconnects = GaugeMetricFamily('kibana_requests_disconnects',
                                       'Total requests disconnected',
                                       value=req_dict['disconnects'])
-    per_status = CounterMetricFamily('kibana_requests',
+    per_status = GaugeMetricFamily('kibana_requests',
                                      'Total requests by status code',
                                      labels=['status_code'])
 
