@@ -73,10 +73,16 @@ See below for how Kibana handles this internally :
 * [PR that replaces accumulating counters](https://github.com/elastic/kibana/pull/20577/files#r202416647)
 * [Source code](https://github.com/elastic/kibana/blob/master/src/legacy/server/status/collectors/get_ops_stats_collector.js#L27)
 
+A possible workaround is setting Kibana `ops.interval` to the same value as the scrape interval
+and using the statistics timestamp from the response as the Prometheus timestamp.
+
 ### Missing metrics
 
 I have noticed since the update to Kibana 6.7 that sometimes the avg request time is missing from the stats dictionary.
-I'm not yet sure how to handle this.
+[Source](https://github.com/elastic/kibana/blob/6.7/src/server/status/lib/metrics.js#L73)
+
+The reason is probably a division by 0 when there are no requests during the sampling interval.
+I think it's better to set the value to 0 then to have a gap  in the time series.
 
 
 ## Contributing

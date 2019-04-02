@@ -90,9 +90,14 @@ def _response_times(rt_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily):
     max_rt = GaugeMetricFamily('kibana_response_time_max_seconds',
                                'Kibana maximum response time in seconds',
                                value=rt_dict['max_in_millis'] / 1000)
+
+    # Kibana statistics lib can sometimes return NaN for this value.
+    # If that is the case, this is set to 0 in order to avoid gaps in the time series.
+    # Reference: https://github.com/elastic/kibana/blob/6.7/src/server/status/lib/metrics.js#L73
+    # NaN is converted to `undefined` which then has the whole field removed from the response JSON
     avg_rt = GaugeMetricFamily('kibana_response_time_avg_seconds',
                                'Kibana average response time in seconds',
-                               value=rt_dict['avg_in_millis'] / 1000)
+                               value=rt_dict.setdefault('avg_in_millis', 0) / 1000)
     return max_rt, avg_rt
 
 
