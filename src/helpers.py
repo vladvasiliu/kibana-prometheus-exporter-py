@@ -6,8 +6,13 @@ class TimestampMixin(object):
         try:
             self._timestamp = kwargs.pop('timestamp')
         except KeyError:
-            pass
+            self._timestamp = None
         super(TimestampMixin, self).__init__(*args, **kwargs)
+
+    def add_metric(self, *args, **kwargs):
+        if 'timestamp' not in kwargs:
+            kwargs['timestamp'] = self._timestamp
+        super(TimestampMixin, self).add_metric(*args, **kwargs)
 
 
 class TimestampGaugeMetricFamily(TimestampMixin, GaugeMetricFamily):
