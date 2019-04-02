@@ -9,7 +9,7 @@ class TimestampMixinTestBase(TestCase):
     def test_timestamp_metric_family_has_timestamp_if_set(self):
         timestamp = 214
         t = TimestampGaugeMetricFamily('some_name', 'some description', timestamp=timestamp)
-        self.assertEquals(t._timestamp, timestamp)
+        self.assertEqual(t._timestamp, timestamp)
 
     def test_timestamp_metric_family_has_none_timestamp_if_unset(self):
         t = TimestampGaugeMetricFamily('some_name', 'some description')

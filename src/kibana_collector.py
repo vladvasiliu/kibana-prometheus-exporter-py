@@ -18,6 +18,11 @@ def datestring_to_timestamp(date_str: str) -> float:
     return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f%z').timestamp()
 
 
+def _info(info: dict) -> InfoMetricFamily:
+    info = {k: str(v) for k, v in info.items()}
+    return InfoMetricFamily('kibana_version', 'Kibana Version', value=info)
+
+
 def _status(status: dict) -> (StateSetMetricFamily, GaugeMetricFamily):
     status_dict = {state: state == status['overall']['state'] for state in ['red', 'yellow', 'green']}
     since = datestring_to_timestamp(status['overall']['since'])
@@ -151,7 +156,7 @@ class KibanaCollector(object):
             logger.warning('Got a RequestException while trying to contact Kibana:\n%s' % e)
         else:
             kibana_up = GaugeMetricFamily('kibana_node_reachable', 'Kibana node was reached', value=1)
-            yield InfoMetricFamily('kibana_version', 'Kibana Version', value=stats['version'])
+            yield _info(stats['version'])
             yield from _status(stats['status'])
             yield from Metrics(stats['metrics'])
         finally:
