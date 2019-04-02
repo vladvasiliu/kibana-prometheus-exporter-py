@@ -65,7 +65,8 @@ A docker container is built and hosted [on the Docker Hub](https://pipenv.readth
 
 ### All metrics are gauges
 
-The exporter reads data from the Kibana Stats API. This API only provides "real time" metrics, refreshed every 5 seconds. As such, some metrics which usually are counters can only be gauges (eg `kibana_requests_total`).
+The exporter reads data from the Kibana Stats API. This API only provides "real time" metrics, refreshed every 5 seconds.
+As such, some metrics which usually are counters can only be gauges (eg `kibana_requests_total`).
 
 See below for how Kibana handles this internally :
 
@@ -74,7 +75,8 @@ See below for how Kibana handles this internally :
 
 ### Missing metrics
 
-I have noticed since the update to Kibana 6.7 that sometimes the avg request time is missing from the stats dictionary. 
+I have noticed since the update to Kibana 6.7 that sometimes the avg request time is missing from the stats dictionary.
+I'm not yet sure how to handle this.
 
 
 ## Contributing
