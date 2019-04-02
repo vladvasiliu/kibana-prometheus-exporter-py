@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9ab25f78d6286bf8a6ccb0e8fafc255f3727762674759bc4c0b9af564d5a0ac4"
+            "sha256": "97acff32bd4932dbe97a94369d77db8976eff4fce7065f06dc0c3f2457d7ef3d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -73,9 +73,11 @@
             "version": "==17.5.0"
         },
         "prometheus-client": {
-            "editable": true,
-            "git": "https://github.com/vladvasiliu/client_python.git",
-            "ref": "93c8f236707096f38cd15800799a5e64e079461a"
+            "hashes": [
+                "sha256:1b38b958750f66f208bcd9ab92a633c0c994d8859c831f7abc1f46724fcee490"
+            ],
+            "index": "pypi",
+            "version": "==0.6.0"
         },
         "pyhamcrest": {
             "hashes": [
