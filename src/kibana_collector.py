@@ -23,91 +23,96 @@ def _status(status: dict) -> (StateSetMetricFamily, GaugeMetricFamily):
     return status, since
 
 
-def _process(process_dict: dict) -> (GaugeMetricFamily,
-                                     GaugeMetricFamily,
-                                     GaugeMetricFamily,
-                                     GaugeMetricFamily,
-                                     CounterMetricFamily):
-    heap_total = GaugeMetricFamily('kibana_process_memory_heap_total_bytes',
-                                   'Total heap size in bytes',
-                                   value=process_dict['memory']['heap']['total_in_bytes'])
-    heap_used = GaugeMetricFamily('kibana_process_memory_heap_used_bytes',
-                                  'Used heap size in bytes',
-                                  value=process_dict['memory']['heap']['used_in_bytes'])
-    size_limit = GaugeMetricFamily('kibana_process_memory_heap_size_limit_bytes',
-                                   'Heap size limit in bytes',
-                                   value=process_dict['memory']['heap']['size_limit'])
-    resident_set_size = GaugeMetricFamily('kibana_process_memory_resident_set_size_bytes',
-                                          'Memory resident set size',
-                                          value=process_dict['memory']['resident_set_size_in_bytes'])
-    uptime = CounterMetricFamily('kibana_process_uptime_seconds',
-                                 'Kibana process uptime in seconds',
-                                 value=process_dict['uptime_in_millis'] / 1000)
+class Metrics(object):
+    def __init__(self, metrics_dict: dict):
+        self._timestamp = datestring_to_timestamp(metrics_dict['last_updated'])
+        self._metrics_dict = metrics_dict
 
-    return heap_used, heap_total, size_limit, resident_set_size, uptime
+    def __iter__(self):
+        yield from self._response_times()
+        yield from self._requests()
+        yield from self._process()
+        yield from self._os()
 
+    def _os(self):
+        os_dict = self._metrics_dict['os']
 
-def _os_load(load_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily, GaugeMetricFamily):
-    return (GaugeMetricFamily('kibana_os_load_%s' % key,
-                              'Kibana OS load %s' % key,
-                              value=value) for key, value in load_dict.items())
+        yield from (GaugeMetricFamily('kibana_os_load_%s' % key,
+                                      'Kibana OS load %s' % key,
+                                      value=value) for key, value in os_dict['load'].items())
 
+        yield from (GaugeMetricFamily('kibana_os_memory_%s_bytes' % key.split('_')[0],
+                                      'Kibana %s OS memory' % key.split('_')[0],
+                                      value=value) for key, value in os_dict['memory'].items())
 
-def _os_memory(mem_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily, GaugeMetricFamily):
-    return (GaugeMetricFamily('kibana_os_memory_%s_bytes' % key.split('_')[0],
-                              'Kibana %s OS memory' % key.split('_')[0],
-                              value=value) for key, value in mem_dict.items())
+        yield CounterMetricFamily('kibana_os_uptime_seconds',
+                                  'Kibana OS uptime in seconds',
+                                  value=os_dict['uptime_in_millis'] / 1000)
 
+    def _response_times(self) -> (GaugeMetricFamily, GaugeMetricFamily):
+        rt_dict = self._metrics_dict['response_times']
 
-def _os(os_dict: dict) -> iter:
-    result = []
-    result.extend(_os_load(os_dict['load']))
-    result.extend(_os_memory(os_dict['memory']))
-    result.append(CounterMetricFamily('kibana_os_uptime_seconds',
-                                      'Kibana OS uptime in seconds',
-                                      value=os_dict['uptime_in_millis'] / 1000))
-    return result
+        max_rt = GaugeMetricFamily('kibana_response_time_max_seconds',
+                                   'Kibana maximum response time in seconds')
+        max_rt.add_metric(labels=[], value=rt_dict['max_in_millis'] / 1000, timestamp=self._timestamp)
 
+        # Kibana statistics lib can sometimes return NaN for this value.
+        # If that is the case, this is set to 0 in order to avoid gaps in the time series.
+        # Reference: https://github.com/elastic/kibana/blob/6.7/src/server/status/lib/metrics.js#L73
+        # NaN is converted to `undefined` which then has the whole field removed from the response JSON
+        avg_rt = GaugeMetricFamily('kibana_response_time_avg_seconds',
+                                   'Kibana average response time in seconds')
+        avg_rt.add_metric(labels=[], value=rt_dict.setdefault('avg_in_millis', 0) / 1000, timestamp=self._timestamp)
+        return max_rt, avg_rt
 
-def _requests(req_dict: dict) -> iter:
-    total = GaugeMetricFamily('kibana_requests_total',
-                                'Total requests serviced',
-                                value=req_dict['total'])
-    disconnects = GaugeMetricFamily('kibana_requests_disconnects',
-                                      'Total requests disconnected',
-                                      value=req_dict['disconnects'])
-    per_status = GaugeMetricFamily('kibana_requests',
-                                     'Total requests by status code',
-                                     labels=['status_code'])
+    def _requests(self) -> iter:
+        req_dict = self._metrics_dict['requests']
+        total = GaugeMetricFamily('kibana_requests_total',
+                                  'Total requests serviced')
+        total.add_metric(labels=[], value=req_dict['total'], timestamp=self._timestamp)
 
-    for code, count in req_dict['status_codes'].items():
-        per_status.add_metric([code], count)
+        disconnects = GaugeMetricFamily('kibana_requests_disconnects',
+                                        'Total requests disconnected')
+        disconnects.add_metric(labels=[], value=req_dict['disconnects'], timestamp=self._timestamp)
 
-    return total, disconnects, per_status
+        per_status = GaugeMetricFamily('kibana_requests',
+                                       'Total requests by status code',
+                                       labels=['status_code'])
 
+        for code, count in req_dict['status_codes'].items():
+            per_status.add_metric(labels=[code], value=count, timestamp=self._timestamp)
 
-def _response_times(rt_dict: dict) -> (GaugeMetricFamily, GaugeMetricFamily):
-    max_rt = GaugeMetricFamily('kibana_response_time_max_seconds',
-                               'Kibana maximum response time in seconds',
-                               value=rt_dict['max_in_millis'] / 1000)
+        return total, disconnects, per_status
 
-    # Kibana statistics lib can sometimes return NaN for this value.
-    # If that is the case, this is set to 0 in order to avoid gaps in the time series.
-    # Reference: https://github.com/elastic/kibana/blob/6.7/src/server/status/lib/metrics.js#L73
-    # NaN is converted to `undefined` which then has the whole field removed from the response JSON
-    avg_rt = GaugeMetricFamily('kibana_response_time_avg_seconds',
-                               'Kibana average response time in seconds',
-                               value=rt_dict.setdefault('avg_in_millis', 0) / 1000)
-    return max_rt, avg_rt
+    def _process(self) -> (GaugeMetricFamily, GaugeMetricFamily, GaugeMetricFamily, GaugeMetricFamily, CounterMetricFamily):
+        process_dict = self._metrics_dict['process']
 
+        heap_total = GaugeMetricFamily('kibana_process_memory_heap_total_bytes',
+                                       'Total heap size in bytes')
+        heap_total.add_metric(labels=[], value=process_dict['memory']['heap']['total_in_bytes'],
+                              timestamp=self._timestamp)
 
-def _metrics(metrics_dict: dict):
-    # last_updated = datestring_to_timestamp(metrics_dict['last_updated'])
-    metrics = list(_process(metrics_dict['process']))
-    metrics.extend(_os(metrics_dict['os']))
-    metrics.extend(_requests(metrics_dict['requests']))
-    metrics.extend(_response_times(metrics_dict['response_times']))
-    return metrics
+        heap_used = GaugeMetricFamily('kibana_process_memory_heap_used_bytes',
+                                      'Used heap size in bytes')
+        heap_used.add_metric(labels=[], value=process_dict['memory']['heap']['used_in_bytes'],
+                             timestamp=self._timestamp)
+
+        size_limit = GaugeMetricFamily('kibana_process_memory_heap_size_limit_bytes',
+                                       'Heap size limit in bytes')
+        size_limit.add_metric(labels=[], value=process_dict['memory']['heap']['size_limit'],
+                              timestamp=self._timestamp)
+
+        resident_set_size = GaugeMetricFamily('kibana_process_memory_resident_set_size_bytes',
+                                              'Memory resident set size')
+        resident_set_size.add_metric(labels=[], value=process_dict['memory']['resident_set_size_in_bytes'],
+                                     timestamp=self._timestamp)
+
+        uptime = CounterMetricFamily('kibana_process_uptime_seconds',
+                                     'Kibana process uptime in seconds')
+        uptime.add_metric(labels=[], value=process_dict['uptime_in_millis'] / 1000,
+                          timestamp=self._timestamp)
+
+        return heap_used, heap_total, size_limit, resident_set_size, uptime
 
 
 class KibanaCollector(object):
@@ -139,8 +144,8 @@ class KibanaCollector(object):
             logger.warning('Got a RequestException while trying to contact Kibana:\n%s' % e)
         else:
             kibana_up = GaugeMetricFamily('kibana_node_reachable', 'Kibana node was reached', value=1)
-            yield InfoMetricFamily('kibana_version', 'Kibana Version', value=stats['version'])
-            yield from _status(stats['status'])
-            yield from _metrics(stats['metrics'])
+            # yield InfoMetricFamily('kibana_version', 'Kibana Version', value=stats['version'])
+            # yield from _status(stats['status'])
+            yield from Metrics(stats['metrics'])
         finally:
             yield kibana_up
