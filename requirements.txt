@@ -1,5 +1,5 @@
 -i https://pypi.org/simple
--e git+https://github.com/vladvasiliu/client_python.git@93c8f236707096f38cd15800799a5e64e079461a#egg=prometheus-client
+-e git+https://github.com/vladvasiliu/client_python.git@93c8f236707096f38cd15800799a5e64e079461a#egg=prometheus_client
 attrs==19.1.0
 automat==0.7.0
 certifi==2019.3.9
