@@ -1,6 +1,6 @@
 FROM python:3.7.3-alpine3.9 AS builder
 
-LABEL version="1.1"
+LABEL version="1.9"
 LABEL description="Kibana Prometheus exporter"
 LABEL maintainer="Vlad Vasiliu <vladvasiliun@yahoo.fr>"
 
