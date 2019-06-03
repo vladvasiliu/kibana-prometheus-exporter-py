@@ -1,13 +1,10 @@
 #!env python
-
+import asyncio
 import logging
 import sys
 
-from prometheus_client.twisted import MetricsResource
 from prometheus_client.core import REGISTRY
-from twisted.web.server import Site
-from twisted.web.resource import Resource
-from twisted.internet import reactor
+from prometheus_client.exposition import start_http_server
 
 from config import Config
 from kibana_collector import KibanaCollector
@@ -27,8 +24,11 @@ REGISTRY.register(KibanaCollector(config.kibana_url,
                                   kibana_login=config.kibana_login,
                                   kibana_password=config.kibana_password))
 
-root = Resource()
-root.putChild(b'metrics', MetricsResource(registry=REGISTRY))
-factory = Site(root)
-reactor.listenTCP(config.listen_port, factory)
-reactor.run()
+start_http_server(config.listen_port)
+
+loop = asyncio.get_event_loop()
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    loop.stop()
+    loop.close()

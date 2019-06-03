@@ -2,6 +2,13 @@ from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
 
 
 class TimestampMixin(object):
+    """Add timestamps to *MetricFamily
+
+    The goal is to be a generic drop-in replacement for *MetricFamily.
+    That means that we can be called with the exact same signature as the original class.
+    We don't care about any other argument.
+    The sole assumption is that timestamp is not an argument expected by *MetricFamily.
+    """
     def __init__(self, *args, **kwargs):
         try:
             self._timestamp = kwargs.pop('timestamp')
@@ -21,3 +28,13 @@ class TimestampGaugeMetricFamily(TimestampMixin, GaugeMetricFamily):
 
 class TimestampCounterMetricFamily(TimestampMixin, CounterMetricFamily):
     pass
+
+
+class C():
+    def f(self, truc=None):
+        print('x' + truc)
+
+
+def wrapper(cls, truc=None):
+    new_cls = cls
+    new_cls.f = cls.f()
