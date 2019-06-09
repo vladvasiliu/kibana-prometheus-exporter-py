@@ -1,4 +1,3 @@
-#!env python
 import asyncio
 import logging
 import sys
