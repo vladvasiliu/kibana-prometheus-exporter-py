@@ -28,13 +28,3 @@ class TimestampGaugeMetricFamily(TimestampMixin, GaugeMetricFamily):
 
 class TimestampCounterMetricFamily(TimestampMixin, CounterMetricFamily):
     pass
-
-
-class C():
-    def f(self, truc=None):
-        print('x' + truc)
-
-
-def wrapper(cls, truc=None):
-    new_cls = cls
-    new_cls.f = cls.f()

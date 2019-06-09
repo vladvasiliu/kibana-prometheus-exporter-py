@@ -1,8 +1,6 @@
 from unittest import TestCase
 
-from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
-
-from helpers import TimestampCounterMetricFamily, TimestampGaugeMetricFamily
+from helpers import TimestampGaugeMetricFamily
 
 
 class TimestampMixinTestBase(TestCase):

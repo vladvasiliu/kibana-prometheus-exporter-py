@@ -10,7 +10,7 @@ DEFAULT_PORT = 9563
 logger = logging.getLogger(__name__)
 
 
-class Config():
+class Config:
     def __init__(self):
         self.kibana_url = os.getenv('KIBANA_URL')
         self.listen_port = os.getenv('LISTEN_PORT', DEFAULT_PORT)
@@ -21,7 +21,7 @@ class Config():
 
         numeric_level = getattr(logging, self.log_level.upper(), None)
         if not isinstance(numeric_level, int):
-            logger.critical('Invalid log level: %s' % log_level)
+            logger.critical('Invalid log level: %s' % numeric_level)
             raise ValueError('Invalid log level: %s. Must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL.')
         logging.basicConfig(level=numeric_level)
 
