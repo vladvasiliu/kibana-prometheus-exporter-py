@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from prometheus_client.core import CounterMetricFamily, GaugeMetricFamily
 
 
@@ -28,3 +30,16 @@ class TimestampGaugeMetricFamily(TimestampMixin, GaugeMetricFamily):
 
 class TimestampCounterMetricFamily(TimestampMixin, CounterMetricFamily):
     pass
+
+
+def url_join(host: str, path: str) -> str:
+    """ Produce an URL as expected when the host part has a path.
+
+    The idea is to always have the host end with a `/` and the path be relative. This way `urljoin` keeps both.
+    As `urljoin` removes superfluous slashes, there's no need to check wether `host` ends with one.
+
+    This addresses https://github.com/vladvasiliu/kibana-prometheus-exporter-py/issues/4
+    """
+    host += "/"
+    path = path.lstrip("/")
+    return urljoin(host, path)
