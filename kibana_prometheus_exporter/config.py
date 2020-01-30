@@ -1,5 +1,6 @@
 import logging
 import os
+from urllib.parse import urlparse
 
 from requests.utils import get_netrc_auth
 
@@ -7,32 +8,23 @@ from _version import VERSION
 
 DEFAULT_PORT = 9563
 
-logger = logging.getLogger(__name__)
-
-
 class Config:
     def __init__(self):
-        self.kibana_url = os.getenv('KIBANA_URL')
+        kibana_url = os.getenv('KIBANA_URL')
         listen_port = os.getenv('LISTEN_PORT', DEFAULT_PORT)
-        self.log_level = os.getenv('LOG_LEVEL', 'INFO')
-        self.kibana_login = os.getenv('KIBANA_LOGIN')
-        self.kibana_password = os.getenv('KIBANA_PASSWORD')
+        log_level = os.getenv('LOG_LEVEL', 'INFO')
+        kibana_login = os.getenv('KIBANA_LOGIN')
+        kibana_password = os.getenv('KIBANA_PASSWORD')
+
         self.version = VERSION
-
-        try:
-            self.listen_port = int(listen_port)
-        except ValueError as e:
-            logger.critical("Listen port must be an integer: %s", e)
-            raise ValueError("Listen port must be an integer")
-
-        numeric_level = getattr(logging, self.log_level.upper(), None)
-        if not isinstance(numeric_level, int):
-            logger.critical('Invalid log level: %s' % numeric_level)
-            raise ValueError('Invalid log level: %s. Must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL.')
-        logging.basicConfig(level=numeric_level)
+        self.log_level = _check_log_level(log_level)
+        logging.basicConfig(level=self.log_level)
+        self.kibana_url = _check_url(kibana_url)
+        self.listen_port = _check_port(listen_port)
+        self.kibana_login = kibana_login
+        self.kibana_password = kibana_password
 
         if not self.kibana_url:
-            logger.critical('The Kibana URL is required.')
             raise ValueError('The Kibana URL cannot be empty.')
 
     def description(self):
@@ -56,3 +48,32 @@ class Config:
         for line in config_list:
             desc += (line_template % line)
         return desc
+
+
+def _check_url(url: str) -> str:
+    parsed_url = urlparse(url)
+    if all(parsed_url[:2]):
+        return url
+    else:
+        raise ValueError("URL is malformed.")
+
+
+def _check_port(port: str) -> int:
+    if type(port) not in (str, int):
+        raise ValueError("Listen port must be an integer. Got: %s" % (port,))
+    try:
+        # Avoid converting types that can be represented as an int but are not int-like, such as IPs
+        port = int(port)
+    except (OverflowError, TypeError, ValueError) as e:
+        raise ValueError("Listen port must be an integer: %s" % e)
+    if 0 < port < 65536:
+        return port
+    else:
+        raise ValueError("Listen port must be between 1 and 65535")
+
+
+def _check_log_level(log_level: str) -> int:
+    try:
+        return getattr(logging, log_level.upper())
+    except AttributeError:
+        raise ValueError('Invalid log level: %s. Must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL.' % log_level)

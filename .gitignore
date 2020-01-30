@@ -133,7 +133,8 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-.hypothesis/
+.hypothesis
+!.hypothesis/examples/
 .pytest_cache/
 
 # Translations

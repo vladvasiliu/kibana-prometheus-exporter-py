@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 try:
     config = Config()
-except ValueError:
+except ValueError as e:
+    logger.critical(e)
     logger.critical('Invalid configuration. Exiting.')
     sys.exit(1)
 
