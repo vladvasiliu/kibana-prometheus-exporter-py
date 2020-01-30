@@ -13,11 +13,17 @@ logger = logging.getLogger(__name__)
 class Config:
     def __init__(self):
         self.kibana_url = os.getenv('KIBANA_URL')
-        self.listen_port = os.getenv('LISTEN_PORT', DEFAULT_PORT)
+        listen_port = os.getenv('LISTEN_PORT', DEFAULT_PORT)
         self.log_level = os.getenv('LOG_LEVEL', 'INFO')
         self.kibana_login = os.getenv('KIBANA_LOGIN')
         self.kibana_password = os.getenv('KIBANA_PASSWORD')
         self.version = VERSION
+
+        try:
+            self.listen_port = int(listen_port)
+        except ValueError as e:
+            logger.critical("Listen port must be an integer: %s", e)
+            raise ValueError("Listen port must be an integer")
 
         numeric_level = getattr(logging, self.log_level.upper(), None)
         if not isinstance(numeric_level, int):
