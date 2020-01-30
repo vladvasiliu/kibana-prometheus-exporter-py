@@ -5,10 +5,9 @@ from typing import Iterator
 from prometheus_client.core import InfoMetricFamily, StateSetMetricFamily, GaugeMetricFamily, Metric
 
 from requests import get
-from requests.compat import urljoin
 from requests.exceptions import ConnectionError, Timeout, HTTPError, RequestException
 
-from helpers import TimestampGaugeMetricFamily, TimestampCounterMetricFamily
+from helpers import TimestampGaugeMetricFamily, TimestampCounterMetricFamily, url_join
 
 
 logger = logging.getLogger(__name__)
@@ -129,7 +128,7 @@ class Metrics(object):
 
 class KibanaCollector(object):
     def __init__(self, host: str, path: str = '/api/status', kibana_login: str = None, kibana_password: str = None):
-        self._url = urljoin(host, path)
+        self._url = url_join(host, path)
         self._kibana_login = kibana_login
         self._kibana_password = kibana_password
 

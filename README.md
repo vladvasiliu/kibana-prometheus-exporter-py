@@ -14,13 +14,13 @@ This is a Prometheus exporter for Kibana written in Python.
 
 Configuration is done via environment variables. Available parameters:
 
-|Parameter      |Default|
-|---------------|-------|
-|KIBANA_URL     |-      |
-|LISTEN_PORT    |9563   |
-|LOG_LEVEL      |INFO   |
-|KIBANA_LOGIN   |-      |
-|KIBANA_PASSWORD|-      |
+|Parameter      |Default|Required|
+|---------------|-------|--------|
+|KIBANA_URL     |-      |Yes     |
+|LISTEN_PORT    |9563   |No      |
+|LOG_LEVEL      |INFO   |No      |
+|KIBANA_LOGIN   |-      |No      |
+|KIBANA_PASSWORD|-      |No      |
 
 Authentication can also be done via a netrc file. `requests` natively supports this.
 
@@ -41,17 +41,13 @@ This project uses the following libraries:
 * [Requests](http://docs.python-requests.org/en/master/)
 * [Twisted](https://www.twistedmatrix.com/trac/)
 
-To install dependencies with `pipenv`:
-
-    pipenv install --deploy
-
-If you want to use classic `pip` instead:
+Install the dependencies:
 
     pip install -r requirements.txt
 
 Run the program specifying options:
 
-    KIBANA_URL="https://your_kibana_node.com" python src/main.py
+    KIBANA_URL="https://your_kibana_node.com" python kibana_prometheus_exporter
 
 
 #### Docker
