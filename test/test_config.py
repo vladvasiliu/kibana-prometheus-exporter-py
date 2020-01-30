@@ -1,3 +1,4 @@
+import logging
 from unittest import TestCase
 
 from hypothesis import example, given, strategies as st
@@ -39,3 +40,16 @@ class TestCheckPort(TestCase):
     @given(port=_everything_except(int))
     def test_raises_for_text(self, port):
         self.assertRaises(ValueError, config._check_port, port)
+
+
+log_levels = ["DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL", "FATAL"]
+
+
+class TestCheckLogLevel(TestCase):
+    @given(st.text().filter(lambda x: x.upper() not in log_levels))
+    def test_check_log_level_raises_for_random_text(self, value):
+        self.assertRaises(ValueError, config._check_log_level, value)
+
+    @given(_everything_except(str))
+    def test_check_log_level_raises_for_random_non_text_stuff(self, value):
+        self.assertRaises(ValueError, config._check_log_level, value)

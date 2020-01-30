@@ -75,5 +75,5 @@ def _check_port(port: str) -> int:
 def _check_log_level(log_level: str) -> int:
     try:
         return getattr(logging, log_level.upper())
-    except AttributeError:
+    except (AttributeError, TypeError):
         raise ValueError('Invalid log level: %s. Must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL.' % log_level)
