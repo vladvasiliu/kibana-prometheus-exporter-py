@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from hypothesis import given, strategies as st
+from hypothesis import example, given, strategies as st
+from hypothesis.provisional import domains, urls
 
 import config
 
@@ -10,25 +11,19 @@ def _everything_except(excluded_types):
 
 
 class TestCheckURL(TestCase):
-    def test_full_url_with_params(self):
-        url = "http://example.com/some/path?x=2"
+    @given(urls())
+    @example("http://example.com/some/path?x=2")
+    @example("http://example.com/some/path")
+    @example("http://example.com/")
+    @example("http://example.com")
+    def test_full_url_is_ok(self, url):
         self.assertEqual(config._check_url(url), url)
 
-    def test_full_url_without_params(self):
-        url = "http://example.com/some/path"
-        self.assertEqual(config._check_url(url), url)
-
-    def test_url_without_path(self):
-        for url in ["http://example.com/", "http://example.com"]:
-            with self.subTest(url=url):
-                self.assertEqual(config._check_url(url), url)
-
-    def test_raises_with_missing_scheme(self):
-        url = "example.com"
-        self.assertRaises(ValueError, config._check_url, url)
-
-    def test_raises_for_empty_scheme(self):
-        url = "://example.com"
+    @given(domains())
+    @example(None)
+    @example("example.com")
+    @example("://example.com")
+    def test_raises_for_missing_or_wrong_scheme(self, url):
         self.assertRaises(ValueError, config._check_url, url)
 
 
