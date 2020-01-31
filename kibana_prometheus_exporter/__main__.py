@@ -24,7 +24,11 @@ REGISTRY.register(KibanaCollector(config.kibana_url,
                                   kibana_login=config.kibana_login,
                                   kibana_password=config.kibana_password))
 
-start_http_server(config.listen_port)
+try:
+    start_http_server(config.listen_port)
+except PermissionError as e:
+    logger.critical("Cannot bind to port %s. Permission denied.", config.listen_port)
+    sys.exit(2)
 
 loop = asyncio.get_event_loop()
 try:
