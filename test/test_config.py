@@ -12,7 +12,7 @@ def _everything_except(excluded_types):
 
 
 MIN_PORT = 0
-MAX_PORT = 2**16-1
+MAX_PORT = 2 ** 16 - 1
 PORTS_VALID = st.integers(min_value=MIN_PORT, max_value=MAX_PORT)
 PORTS_INVALID = st.integers().filter(lambda x: x < MIN_PORT or x > MAX_PORT)
 

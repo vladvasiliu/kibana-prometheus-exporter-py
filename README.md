@@ -2,6 +2,7 @@
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/vladvasiliu/kibana_exporter.svg)
 [![Docker Pulls](https://img.shields.io/docker/pulls/vladvasiliu/kibana_exporter.svg)](https://hub.docker.com/r/vladvasiliu/kibana_exporter)
 [![License](https://img.shields.io/github/license/vladvasiliu/kibana-prometheus-exporter-py.svg)](COPYING)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 # kibana-prometheus-exporter
