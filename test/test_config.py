@@ -1,7 +1,7 @@
 import logging
 from unittest import TestCase
 
-from hypothesis import example, given, strategies as st
+from hypothesis import example, given, strategies as st, assume
 from hypothesis.provisional import domains, urls
 
 import config
@@ -9,6 +9,26 @@ import config
 
 def _everything_except(excluded_types):
     return st.from_type(type).flatmap(st.from_type).filter(lambda x: not isinstance(x, excluded_types))
+
+
+MIN_PORT = 0
+MAX_PORT = 2**16-1
+PORTS_VALID = st.integers(min_value=MIN_PORT, max_value=MAX_PORT)
+PORTS_INVALID = st.integers().filter(lambda x: x < MIN_PORT or x > MAX_PORT)
+
+
+@st.composite
+def _urls_with_out_of_bounds_port(draw):
+    domain = draw(domains())
+    port = draw(PORTS_INVALID)
+    return "http://%s:%d" % (domain, port)
+
+
+@st.composite
+def _urls_with_bogus_port(draw):
+    domain = draw(domains())
+    port = draw(_everything_except(int))
+    return "http://%s:%s" % (domain, port)
 
 
 class TestCheckURL(TestCase):
@@ -27,13 +47,24 @@ class TestCheckURL(TestCase):
     def test_raises_for_missing_or_wrong_scheme(self, url):
         self.assertRaises(ValueError, config._check_url, url)
 
+    @given(_urls_with_out_of_bounds_port())
+    def test_raises_for_out_of_bounds_port_number(self, url):
+        self.assertRaises(ValueError, config._check_url, url)
+
+    @given(domain=domains(), port=_everything_except(int))
+    def test_raises_for_bogus_port_number(self, domain, port):
+        assume(str(port) != "[]")  # urllib bug: https://bugs.python.org/issue36338
+        url = "http://%s:%s" % (domain, port)
+        print(url)
+        self.assertRaises(ValueError, config._check_url, url)
+
 
 class TestCheckPort(TestCase):
-    @given(st.integers(min_value=1, max_value=65535))
+    @given(PORTS_VALID)
     def test_port_range_works(self, port):
         self.assertEqual(config._check_port(port), port)
 
-    @given(st.integers().filter(lambda x: x < 1 or x > 65535))
+    @given(PORTS_INVALID)
     def test_outside_port_range_fails(self, port):
         self.assertRaises(ValueError, config._check_port, port)
 

@@ -1,6 +1,6 @@
 import logging
 import os
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from requests.utils import get_netrc_auth
 
@@ -54,11 +54,14 @@ class Config:
 
 
 def _check_url(url: str) -> str:
-    parsed_url = urlparse(url)
-    if all(parsed_url[:2]):
-        return url
-    else:
+    split_url = urlsplit(url)
+    if not all(split_url[:2]):
         raise ValueError("URL is malformed.")
+    try:
+        split_url.port
+    except ValueError as e:
+        raise ValueError("URL is malformed: %s" % e)
+    return url
 
 
 def _check_port(port: str) -> int:
@@ -69,7 +72,7 @@ def _check_port(port: str) -> int:
         port = int(port)
     except (OverflowError, TypeError, ValueError) as e:
         raise ValueError("Listen port must be an integer: %s" % e)
-    if 0 < port < 65536:
+    if 0 <= port <= 65535:
         return port
     else:
         raise ValueError("Listen port must be between 1 and 65535")
