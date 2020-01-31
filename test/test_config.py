@@ -42,11 +42,13 @@ class TestCheckPort(TestCase):
         self.assertRaises(ValueError, config._check_port, port)
 
 
-log_levels = ["DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL", "FATAL"]
-
-
 class TestCheckLogLevel(TestCase):
-    @given(st.text().filter(lambda x: x.upper() not in log_levels))
+    def test_check_log_level_works_for_expected_values(self):
+        for level in config.LOG_LEVELS:
+            with self.subTest(level):
+                self.assertEqual(config._check_log_level(level), getattr(logging, level.upper()))
+
+    @given(st.text().filter(lambda x: x.upper() not in config.LOG_LEVELS))
     def test_check_log_level_raises_for_random_text(self, value):
         self.assertRaises(ValueError, config._check_log_level, value)
 

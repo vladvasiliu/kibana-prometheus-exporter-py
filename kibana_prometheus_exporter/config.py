@@ -8,6 +8,9 @@ from _version import VERSION
 
 DEFAULT_PORT = 9563
 
+LOG_LEVELS = ["DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL", "FATAL"]
+
+
 class Config:
     def __init__(self):
         kibana_url = os.getenv('KIBANA_URL')
@@ -76,4 +79,4 @@ def _check_log_level(log_level: str) -> int:
     try:
         return getattr(logging, log_level.upper())
     except (AttributeError, TypeError):
-        raise ValueError('Invalid log level: %s. Must be one of DEBUG, INFO, WARNING, ERROR, CRITICAL.' % log_level)
+        raise ValueError('Invalid log level: %s. Must be one of %s.' % (", ".join(LOG_LEVELS), log_level))
