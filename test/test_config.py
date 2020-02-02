@@ -53,9 +53,8 @@ class TestCheckURL(TestCase):
 
     @given(domain=domains(), port=_everything_except(int))
     def test_raises_for_bogus_port_number(self, domain, port):
-        assume(str(port) != "[]")  # urllib bug: https://bugs.python.org/issue36338
+        assume(str(port) not in ("[]", ""))  # urllib bug: https://bugs.python.org/issue36338
         url = "http://%s:%s" % (domain, port)
-        print(url)
         self.assertRaises(ValueError, config._check_url, url)
 
 
@@ -70,6 +69,7 @@ class TestCheckPort(TestCase):
 
     @given(port=_everything_except(int))
     def test_raises_for_text(self, port):
+        assume(not str(port).isnumeric())
         self.assertRaises(ValueError, config._check_port, port)
 
 
