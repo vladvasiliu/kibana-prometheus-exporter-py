@@ -18,6 +18,7 @@ class Config:
         log_level = os.getenv("LOG_LEVEL", "INFO")
         kibana_login = os.getenv("KIBANA_LOGIN")
         kibana_password = os.getenv("KIBANA_PASSWORD")
+        ignore_ssl = os.getenv("IGNORE_SSL", "FALSE")
 
         self.version = VERSION
         self.log_level = _check_log_level(log_level)
@@ -26,6 +27,8 @@ class Config:
         self.listen_port = _check_port(listen_port)
         self.kibana_login = kibana_login
         self.kibana_password = kibana_password
+        self.ignore_ssl = _check_ssl(ignore_ssl)
+        self.requests_ca_bundle = os.environ.get("REQUESTS_CA_BUNDLE") or None
 
         if not self.kibana_url:
             raise ValueError("The Kibana URL cannot be empty.")
@@ -45,6 +48,15 @@ class Config:
             config_list.append(("Kibana login:", self.kibana_login))
             config_list.append(("Kibana password:", "***"))
 
+        if self.ignore_ssl:
+            config_list.append(("SSL verification:", "disabled"))
+        else:
+            config_list.append(("SSL verification:", "enabled"))
+            if self.requests_ca_bundle and os.path.isfile(self.requests_ca_bundle):
+                config_list.append(("Requests CA bundle path:", self.requests_ca_bundle))
+            else:
+                raise ValueError("REQUESTS_CA_BUNDLE should point to existing certficate")
+
         max_length = max(map(lambda x: len(x[0]), config_list))
         desc = "== CONFIGURATION ==\n"
         line_template = "%-" + str(max_length) + "s\t%s\n"
@@ -62,6 +74,15 @@ def _check_url(url: str) -> str:
     except ValueError as e:
         raise ValueError("URL is malformed: %s" % e)
     return url
+
+
+def _check_ssl(ignore_ssl: str) -> bool:
+    if ignore_ssl.upper() == "TRUE":
+        return True
+    elif ignore_ssl.upper() == "FALSE":
+        return False
+    else:
+        raise ValueError("IGNORE_SSL should be `True` or `False`")
 
 
 def _check_port(port: str) -> int:

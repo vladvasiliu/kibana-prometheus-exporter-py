@@ -21,7 +21,12 @@ except ValueError as e:
 logger.info("Starting Kibana Prometheus exporter version %s\n" % config.version + config.description())
 
 REGISTRY.register(
-    KibanaCollector(config.kibana_url, kibana_login=config.kibana_login, kibana_password=config.kibana_password)
+    KibanaCollector(
+        config.kibana_url,
+        kibana_login=config.kibana_login,
+        kibana_password=config.kibana_password,
+        ignore_ssl=config.ignore_ssl,
+    )
 )
 
 try:
