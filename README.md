@@ -14,15 +14,19 @@ This is a Prometheus exporter for Kibana written in Python.
 
 Configuration is done via environment variables. Available parameters:
 
-|Parameter      |Default|Required|
-|---------------|-------|--------|
-|KIBANA_URL     |-      |Yes     |
-|LISTEN_PORT    |9563   |No      |
-|LOG_LEVEL      |INFO   |No      |
-|KIBANA_LOGIN   |-      |No      |
-|KIBANA_PASSWORD|-      |No      |
+|Parameter          |Default|Required|
+|-------------------|-------|--------|
+|KIBANA_URL         |-      |Yes     |
+|LISTEN_PORT        |9563   |No      |
+|LOG_LEVEL          |INFO   |No      |
+|KIBANA_LOGIN       |-      |No      |
+|KIBANA_PASSWORD    |-      |No      |
+|IGNORE_SSL         |FALSE  |No      |
+|REQUESTS_CA_BUNDLE |-      |No      |
 
 Authentication can also be done via a netrc file. `requests` natively supports this.
+
+You can provide CA bundle for `requests` library using the `REQUESTS_CA_BUNDLE` environment variable
 
 Documentation:
 * [`requests`](http://docs.python-requests.org/en/master/user/authentication/)
