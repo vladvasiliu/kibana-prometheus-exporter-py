@@ -156,7 +156,7 @@ class KibanaCollector(object):
         path: str = "/api/status",
         kibana_login: str = None,
         kibana_password: str = None,
-        ignore_ssl: str = None,
+        ignore_ssl: bool = False,
     ):
         self._url = url_join(host, path)
         self._kibana_login = kibana_login
@@ -170,7 +170,7 @@ class KibanaCollector(object):
             auth = None
 
         if self._ignore_ssl == True:
-            r = get(self._url, auth=auth, verify=False)
+            r = get(self._url, auth=auth, verify=not self._ignore_ssl)
         else:
             r = get(self._url, auth=auth)
 
