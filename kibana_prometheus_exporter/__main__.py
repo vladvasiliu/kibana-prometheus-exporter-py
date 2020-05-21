@@ -5,8 +5,8 @@ import sys
 from prometheus_client.core import REGISTRY
 from prometheus_client.exposition import start_http_server
 
-from config import Config
-from kibana_collector import KibanaCollector
+from .config import Config
+from .kibana_collector import KibanaCollector
 
 logger = logging.getLogger(__name__)
 

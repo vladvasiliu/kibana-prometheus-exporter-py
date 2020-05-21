@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from kibana_collector import Metrics
+from kibana_prometheus_exporter.kibana_collector import Metrics
 
 
 class TestMetrics(TestCase):

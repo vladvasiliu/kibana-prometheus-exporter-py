@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 
 from requests.utils import get_netrc_auth
 
-from _version import VERSION
+from ._version import VERSION
 
 DEFAULT_PORT = 9563
 

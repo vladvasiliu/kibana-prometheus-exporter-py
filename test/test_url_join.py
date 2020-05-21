@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from helpers import url_join
+from kibana_prometheus_exporter.helpers import url_join
 
 
 class TestURLJoin(TestCase):

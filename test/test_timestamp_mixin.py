@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from helpers import TimestampGaugeMetricFamily
+from kibana_prometheus_exporter.helpers import TimestampGaugeMetricFamily
 
 
 class TimestampMixinTestBase(TestCase):

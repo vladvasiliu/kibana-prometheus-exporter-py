@@ -4,7 +4,7 @@ from unittest import TestCase
 from hypothesis import example, given, strategies as st, assume
 from hypothesis.provisional import domains, urls
 
-import config
+from kibana_prometheus_exporter import config
 
 
 def _everything_except(excluded_types):

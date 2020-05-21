@@ -7,7 +7,7 @@ from prometheus_client.core import InfoMetricFamily, StateSetMetricFamily, Gauge
 from requests import get
 from requests.exceptions import ConnectionError, Timeout, HTTPError, RequestException
 
-from helpers import TimestampGaugeMetricFamily, TimestampCounterMetricFamily, url_join
+from .helpers import TimestampGaugeMetricFamily, TimestampCounterMetricFamily, url_join
 
 
 logger = logging.getLogger(__name__)
