@@ -1,10 +1,10 @@
 FROM python:3.8.3-alpine3.11 AS builder
 
-LABEL version="1.13"
+LABEL version="1.14"
 LABEL description="Kibana Prometheus exporter"
 LABEL maintainer="Vlad Vasiliu <vladvasiliun@yahoo.fr>"
 
-ARG PORT=9563
+ENV PORT=9563
 EXPOSE $PORT
 
 
