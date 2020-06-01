@@ -58,7 +58,7 @@ Run the program specifying options:
 
 #### Docker
 
-A docker container is built and hosted [on the Docker Hub](https://pipenv.readthedocs.io/en/latest/). To run it:
+A docker container is built and hosted [on the Docker Hub](https://hub.docker.com/repository/docker/vladvasiliu/kibana_exporter/general). To run it:
 
     docker run -d -p 9563:9563 --name kibana_exporter -e KIBANA_URL="https://your_kibana_node.com" vladvasiliu/kibana_exporter:latest
 
