@@ -8,6 +8,8 @@
 
 This is a Prometheus exporter for Kibana written in Python.
 
+See the [changelog](CHANGELOG.md).
+
 ## Usage
 
 ### Configuration
