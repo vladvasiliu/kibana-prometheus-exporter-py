@@ -37,7 +37,7 @@ class Config:
     def description(self):
         config_list = [
             ("Listen port:", self.listen_port),
-            ("Log level:", self.log_level),
+            ("Log level:", logging.getLevelName(self.log_level)),
             ("Kibana URL:", self.kibana_url),
         ]
         # check if netrc is available
