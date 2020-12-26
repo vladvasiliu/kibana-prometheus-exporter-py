@@ -1,4 +1,6 @@
-FROM python:3.8.6-alpine3.12 AS builder
+ARG BASE_IMAGE="python:3.9.1-alpine3.12"
+
+FROM $BASE_IMAGE AS builder
 
 
 
@@ -14,9 +16,9 @@ RUN     pip install virtualenv && \
 
 COPY    kibana_prometheus_exporter /venv/kibana_prometheus_exporter
 
-FROM python:3.8.6-alpine3.12
+FROM $BASE_IMAGE
 
-LABEL version="1.15.2"
+LABEL version="1.15.3"
 LABEL description="Kibana Prometheus exporter"
 LABEL maintainer="Vlad Vasiliu <vladvasiliun@yahoo.fr>"
 
