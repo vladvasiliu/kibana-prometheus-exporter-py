@@ -4,6 +4,12 @@ This file documents notable changes to Kibana Prometheus Exporter starting with 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) starting with version 1.14.1.
 
+## 1.16.0 - 2021-01-22
+
+* Switched Docker labels to opencontainers format
+* Added pre_build hook for injecting metadata when building on Docker Hub
+* Updated dependencies
+
 ## 1.15.3 - 2020-12-26
 
 Updated dependencies. No user-facing changes are introduced.
