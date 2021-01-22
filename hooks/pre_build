@@ -2,7 +2,7 @@
 
 GIT_HASH=$(git rev-parse --short HEAD)
 BUILD_DATE=$(date --rfc-3339=seconds)
-VERSION=$((git describe --tags || echo "dev") | sed -nr "s/v(.*)/\1/p")
+VERSION=$( (git describe --tags || echo "dev") | sed -nr "s/v(.*)/\1/p")
 
 sed -i "1iARG GIT_HASH=\"${GIT_HASH}\"" Dockerfile
 sed -i "1iARG VERSION=\"${VERSION}\"" Dockerfile
