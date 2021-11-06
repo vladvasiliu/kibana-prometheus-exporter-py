@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="python:3.9.1-alpine3.12"
+ARG BASE_IMAGE="python:3.9.7-alpine3.14"
 
 FROM $BASE_IMAGE AS builder
 
