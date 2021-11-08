@@ -1,5 +1,4 @@
 [![Scrutinizer code quality](https://img.shields.io/scrutinizer/g/vladvasiliu/kibana-prometheus-exporter-py.svg)](https://scrutinizer-ci.com/g/vladvasiliu/kibana-prometheus-exporter-py/)
-![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/vladvasiliu/kibana_exporter.svg)
 [![License](https://img.shields.io/github/license/vladvasiliu/kibana-prometheus-exporter-py.svg)](COPYING)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -58,9 +57,9 @@ Run the program specifying options:
 
 #### Docker
 
-A docker container is built and hosted [on the Docker Hub](https://hub.docker.com/repository/docker/vladvasiliu/kibana_exporter/general). To run it:
+A docker container is hosted [on GitHub Packages](https://github.com/vladvasiliu/kibana-prometheus-exporter-py/pkgs/container/kibana-prometheus-exporter-py). To run it:
 
-    docker run -d -p 9563:9563 --name kibana_exporter -e KIBANA_URL="https://your_kibana_node.com" vladvasiliu/kibana_exporter:latest
+    docker run -d -p 9563:9563 --name kibana_exporter -e KIBANA_URL="https://your_kibana_node.com" ghcr.io/vladvasiliu/kibana-prometheus-exporter-py:latest
 
 
 ## Known issues and limitations
