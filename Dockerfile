@@ -1,20 +1,19 @@
-ARG BASE_IMAGE="python:3.9.7-alpine3.14"
+ARG IMAGE_VERSION="3.10.2-alpine3.15"
 
-FROM $BASE_IMAGE AS builder
+FROM python:${IMAGE_VERSION} AS builder
 
 
-RUN     apk add --no-cache --virtual build-dependencies build-base
+RUN     apk add --no-cache --virtual build-dependencies build-base=0.5-r2
 
 COPY    requirements.txt /
 
-RUN     pip install virtualenv && \
+RUN     pip install --no-cache-dir virtualenv==20.11.0 && \
         virtualenv /venv && \
-        source /venv/bin/activate && \
-        pip install -r /requirements.txt
+        /venv/bin/pip install --no-cache-dir -r /requirements.txt
 
 COPY    kibana_prometheus_exporter /venv/kibana_prometheus_exporter
 
-FROM $BASE_IMAGE
+FROM python:${IMAGE_VERSION}
 
 ARG     VERSION
 ARG     BUILD_DATE
@@ -35,7 +34,7 @@ ENV LISTEN_PORT 9563
 EXPOSE $LISTEN_PORT
 
 COPY --from=builder /venv /venv
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl=7.80.0-r0
 HEALTHCHECK --interval=5s --timeout=3s --start-period=5s CMD curl -s http://127.0.0.1:$LISTEN_PORT -o /dev/null || exit 1
 WORKDIR /venv
 ENTRYPOINT ["/venv/bin/python", "-m", "kibana_prometheus_exporter"]

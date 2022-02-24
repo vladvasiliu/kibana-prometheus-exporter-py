@@ -24,7 +24,7 @@ def _everything_except_int_like():
 
 
 MIN_PORT = 0
-MAX_PORT = 2 ** 16 - 1
+MAX_PORT = 2**16 - 1
 PORTS_VALID = st.integers(min_value=MIN_PORT, max_value=MAX_PORT)
 PORTS_INVALID = st.integers().filter(lambda x: x < MIN_PORT or x > MAX_PORT)
 
@@ -66,7 +66,7 @@ class TestCheckURL(TestCase):
     @given(domain=domains(), port=_everything_except_int_like())
     def test_raises_for_bogus_port_number(self, domain, port):
         assume(str(port) not in ("[]", ""))  # urllib bug: https://bugs.python.org/issue36338
-        assume(str(port) not in ("/"))       # An empty port is allowed
+        assume(str(port) not in ("/"))  # An empty port is allowed
         url = "http://%s:%s" % (domain, port)
         self.assertRaises(ValueError, config._check_url, url)
 

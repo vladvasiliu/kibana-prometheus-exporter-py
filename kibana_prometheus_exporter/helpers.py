@@ -34,7 +34,7 @@ class TimestampCounterMetricFamily(TimestampMixin, CounterMetricFamily):
 
 
 def url_join(host: str, path: str) -> str:
-    """ Produce an URL as expected when the host part has a path.
+    """Produce an URL as expected when the host part has a path.
 
     The idea is to always have the host end with a `/` and the path be relative. This way `urljoin` keeps both.
     As `urljoin` removes superfluous slashes, there's no need to check wether `host` ends with one.

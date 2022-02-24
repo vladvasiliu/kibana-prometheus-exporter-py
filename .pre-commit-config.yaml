@@ -1,10 +1,10 @@
 default_language_version:
-  python: python3.9
+  python: python3.10
 fail_fast: true
 exclude: '^.idea'
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 38b88246ccc552bffaaf54259d064beeee434539  # frozen: v4.0.1
+    rev: 8fe62d14e0b4d7d845a7022c5c2c3ae41bdd3f26  # frozen: v4.1.0
     hooks:
     - id: fix-byte-order-marker
     - id: check-case-conflict
@@ -19,7 +19,11 @@ repos:
     - id: mixed-line-ending
     - id: trailing-whitespace
   - repo: https://github.com/ambv/black
-    rev: 64c8be01f0cfedc94cb1c9ebd342ea77cafbb78a  # frozen: 21.10b0
+    rev: fc0be6eb1e2a96091e6f64009ee5e9081bf8b6c6  # frozen: 22.1.0
     hooks:
     - id: black
-      language_version: python3.9
+      language_version: python3.10
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: 10ecfcc7abe63a83216eba9cbb01cca36ae54622  # frozen: v2.8.0
+    hooks:
+      - id: hadolint

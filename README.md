@@ -72,7 +72,6 @@ As such, some metrics which usually are counters can only be gauges (eg `kibana_
 See below for how Kibana handles this internally :
 
 * [PR that replaces accumulating counters](https://github.com/elastic/kibana/pull/20577/files#r202416647)
-* [Source code](https://github.com/elastic/kibana/blob/master/src/legacy/server/status/collectors/get_ops_stats_collector.js#L27)
 
 A possible workaround is setting Kibana `ops.interval` to the same value as the scrape interval
 and using the statistics timestamp from the response as the Prometheus timestamp.
