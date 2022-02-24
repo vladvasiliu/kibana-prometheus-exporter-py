@@ -22,12 +22,10 @@ def _info(info: dict) -> InfoMetricFamily:
     return InfoMetricFamily("kibana_version", "Kibana Version", value=info)
 
 
-def _status(status: dict) -> (StateSetMetricFamily, GaugeMetricFamily):
-    status_dict = {state: state == status["overall"]["state"] for state in ["red", "yellow", "green"]}
-    since = datestring_to_timestamp(status["overall"]["since"])
+def _status(status: dict) -> StateSetMetricFamily:
+    status_dict = {state: state == status["overall"]["level"] for state in ["available", "degraded"]}
     status = StateSetMetricFamily("kibana_status", "Kibana Status", value=status_dict)
-    since = GaugeMetricFamily("kibana_status_since", "Last change of status, in seconds since epoch", value=since)
-    return status, since
+    return status
 
 
 class Metrics(object):
@@ -79,15 +77,14 @@ class Metrics(object):
         )
 
         # Kibana statistics lib can sometimes return NaN for this value.
-        # If that is the case, this is set to 0 in order to avoid gaps in the time series.
-        # Reference: https://github.com/elastic/kibana/blob/6.7/src/server/status/lib/metrics.js#L73
-        # NaN is converted to `undefined` which then has the whole field removed from the response JSON
-        yield TimestampGaugeMetricFamily(
-            "kibana_response_time_avg_seconds",
-            "Kibana average response time in seconds",
-            value=rt_dict.setdefault("avg_in_millis", 0) / 1000,
-            timestamp=self._timestamp,
-        )
+        # If that is the case, don't output the time series.
+        if avg_in_millis := rt_dict.get("avg_in_millis"):
+            yield TimestampGaugeMetricFamily(
+                "kibana_response_time_avg_seconds",
+                "Kibana average response time in seconds",
+                value=avg_in_millis / 1000,
+                timestamp=self._timestamp,
+            )
 
     def _requests(self) -> Iterator[Metric]:
         req_dict = self._metrics_dict["requests"]
@@ -169,7 +166,7 @@ class KibanaCollector(object):
         else:
             auth = None
 
-        if self._ignore_ssl == True:
+        if self._ignore_ssl is True:
             r = get(self._url, auth=auth, verify=not self._ignore_ssl)
         else:
             r = get(self._url, auth=auth)
@@ -192,7 +189,7 @@ class KibanaCollector(object):
         else:
             kibana_up = GaugeMetricFamily("kibana_node_reachable", "Kibana node was reached", value=1)
             yield _info(stats["version"])
-            yield from _status(stats["status"])
+            yield _status(stats["status"])
             yield from Metrics(stats["metrics"])
         finally:
             yield kibana_up

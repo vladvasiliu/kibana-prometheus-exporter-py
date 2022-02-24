@@ -35,7 +35,7 @@ except PermissionError as e:
     logger.critical("Cannot bind to port %s. Permission denied.", config.listen_port)
     sys.exit(2)
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 try:
     loop.run_forever()
 except KeyboardInterrupt:
