@@ -1,4 +1,4 @@
-ARG IMAGE_VERSION="3.10.2-alpine3.15"
+ARG IMAGE_VERSION="3.10.9-alpine3.17"
 
 FROM python:${IMAGE_VERSION} AS builder
 
@@ -7,7 +7,7 @@ RUN     apk add --no-cache --virtual build-dependencies build-base=0.5-r2
 
 COPY    requirements.txt /
 
-RUN     pip install --no-cache-dir virtualenv==20.11.0 && \
+RUN     pip install --no-cache-dir virtualenv==20.17.1 && \
         virtualenv /venv && \
         /venv/bin/pip install --no-cache-dir -r /requirements.txt
 
@@ -34,7 +34,7 @@ ENV LISTEN_PORT 9563
 EXPOSE $LISTEN_PORT
 
 COPY --from=builder /venv /venv
-RUN apk add --no-cache curl=7.80.0-r0
+RUN apk add --no-cache curl=7.87.0-r0
 HEALTHCHECK --interval=5s --timeout=3s --start-period=5s CMD curl -s http://127.0.0.1:$LISTEN_PORT -o /dev/null || exit 1
 WORKDIR /venv
 ENTRYPOINT ["/venv/bin/python", "-m", "kibana_prometheus_exporter"]
